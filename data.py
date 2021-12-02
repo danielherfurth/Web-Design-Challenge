@@ -10,7 +10,6 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 # endregion
 
-
 geography_df = pd.read_csv(
     r'data/ddf--entities--geo--country.csv',
     index_col='country'
@@ -26,7 +25,7 @@ mortality_df = pd.read_csv(
 
 life_expec_df = pd.read_csv(
     r'data/ddf--datapoints--sp_dyn_le00_in--by--geo--time_life_exp.csv'
-).groupby('geo').agg('max').reset_index()
+).groupby('geo').agg('max')
 
 pov_mort_df = mortality_df.merge(
     poverty_df[['poverty_320']],
@@ -43,7 +42,9 @@ gdp_df = pd.read_csv(
 
 hdi_df = pd.read_csv(r'data/hdi_by_country.csv', index_col='country')
 
-gini_df = pd.read_csv(r'data/gini.csv', index_col='geo').groupby('geo').agg('max')
+gini_df = pd.read_csv(
+    r'data/gini.csv', index_col='geo'
+).groupby('geo').agg('max')
 
 gini_hdi_df = gini_df[['gini']].merge(
     geography_df[['name']],
@@ -58,13 +59,15 @@ gini_hdi_df = gini_df[['gini']].merge(
 
 gini_hdi_df = gini_hdi_df.rename(columns={'index': 'country'})
 
-gini_hdi_df = gini_hdi_df.join(
+df_final = gini_hdi_df.join(
     gdp_df[['gdp_per_cap']],
     on='country'
 ).join(
     merged[['infant_mortality', 'poverty_320', 'world_4region']],
     on='country'
+).join(
+    life_expec_df[['life_exp']],
+    on='country'
+).rename(
+    columns={'world_4region': 'region'}
 )
-
-print(gini_hdi_df.head())
-# gini_hdi_df = gini_hdi_df.reindex(columns=['country', 'name', 'gini', 'hdi', 'gdp_per_cap'])

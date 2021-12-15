@@ -1,9 +1,9 @@
 # %%
 # region
 import pandas as pd
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.graph_objects as go
+import plotly.express as px
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -71,3 +71,34 @@ df_final = gini_hdi_df.join(
 ).rename(
     columns={'world_4region': 'region'}
 )
+
+# %%
+fig, ax = plt.subplots(figsize=(12, 10))
+
+ax = sns.scatterplot(
+    # data=df_final,
+    x=df_final['poverty_320'],
+    y=df_final['hdi'],
+    hue=df_final['region'],
+    size=df_final['infant_mortality'],
+    sizes=(300, 1200),
+    alpha=0.75
+)
+
+plt.xlabel(
+    'Poverty \n(pct of population living on $3.20 per day or less)'
+)
+
+plt.ylabel(
+    'Human Development Index'
+)
+
+
+sns.set(font_scale=1.3)
+
+plt.tight_layout()
+# plt.show()
+
+
+# %%
+plt.savefig('hdi_vs_pov.png')
